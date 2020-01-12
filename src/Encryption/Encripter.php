@@ -8,39 +8,41 @@ use Exception;
 class Encrypter implements EncrypterInterface
 {
     /**
-     * Encryption Algorithm
+     * The salt.
      *
      * @var string
      */
-    private $cipher;
+    protected $salt;
 
     /**
-     * @var string $secret
+     * The encryption algorithm.
+     *
+     * @var string
      */
-    private $secret;
+    protected $cipher;
 
     /**
      * Encrypter constructor.
      *
-     * @param  string $secret
-     * @param  string $cipher
+     * @param string $salt
      * @throws Exception
      */
-    public function __construct(string $secret = '', string $cipher = 'AES-256-CBC')
+    public function __construct(string $salt)
     {
-        $this->secret = $secret ?? $this->salt();
-        $this->cipher = $cipher;
+        $this->cipher = 'AES-256-CBC';
+        $this->salt = $salt ?? $this->salt();
     }
 
+
     /**
-     * Generate new salt to use in encryption
+     * Create a new salt.
      *
      * @return string
      * @throws Exception
      */
-    public function salt(): string
+    public static function salt()
     {
-        return random_bytes(16);
+        return random_bytes(32);
     }
 
     /**
@@ -48,40 +50,128 @@ class Encrypter implements EncrypterInterface
      */
     public function encrypt(string $value): string
     {
-        $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
-
-        // Encrypt the data by using AES 256 encryption in cbc mode
-        $encrypted = openssl_encrypt(
-            $value, $this->cipher, $this->secret, 0, $iv
+        $iv = random_bytes(
+            openssl_cipher_iv_length($this->cipher)
         );
-        if ($encrypted === false) {
-            throw new \RuntimeException(
-                sprintf(
-                    "encryption failed. %s",
-                    " can not encrypt data"
-                )
-            );
+
+        // encrypt the value using openssl
+        $value = \openssl_encrypt(serialize($value), $this->cipher, $this->salt, 0, $iv);
+
+        if ($value === false) {
+            throw new \RuntimeException(sprintf(
+                "encryption failed. input: %s reason: %s",
+                $value, "openssl encryption failed."
+            ));
         }
-        // include $iv with encrypted data
-        // we will need it to verify mac
-        return base64_encode($encrypted . '::' . $iv);
+
+        // this hash mac will be used to make sure we are decrypting the message
+        // which is encrypted with the previous key
+        $mac = $this->hash($iv = base64_encode($iv), $value);
+
+        $json = json_encode(compact('iv', 'value', 'mac'));
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException(sprintf("Encryption failed. input: %s reason: %s",
+                $value, "can not encode message into json."
+            ));
+        }
+
+        return base64_encode($json);
+    }
+
+    /**
+     * Create a MAC for the given value.
+     *
+     * @param string $iv
+     * @param mixed $value
+     * @return string
+     */
+    protected function hash(string $iv, string $value): string
+    {
+        return hash_hmac('sha256', $iv . $value, $this->salt);
     }
 
     /**
      * @inheritDoc
      */
-    public function decrypt(string $value): string
+    public function decrypt(string $payload): string
     {
-        list($encrypted_payload, $iv) = explode('::', base64_decode($value), 2);
-        // decrypt data by using extracted iv and using secret
-        $decrypted = openssl_decrypt(
-            $encrypted_payload, $this->cipher, $this->secret, 0, $iv
+        $payload = $this->getVerifiedPayload($payload);
+
+        $iv = base64_decode($payload['iv']);
+
+        // decrypt the payload.
+        $decrypted = \openssl_decrypt(
+            $payload['value'], $this->cipher, $this->salt, 0, $iv
         );
-        // if some thing is going wrong like invalid secret or invalid payload, exception thrown
+
         if ($decrypted === false) {
-            throw new \RuntimeException("decryption failed.");
+            throw new \RuntimeException(sprintf("Decryption failed. input: %s, %s",
+                $payload, "openssl decrypt failed."
+            ));
         }
 
-        return $decrypted;
+        return unserialize($decrypted);
     }
+
+    /**
+     * Extract encrypted payload
+     *
+     * @param string $payload
+     * @return array
+     * @throws Exception
+     */
+    protected function getVerifiedPayload(string $payload): array
+    {
+        $payload = json_decode(base64_decode($payload), true);
+
+        if (!$this->verifyPayload($payload)) {
+            throw new \RuntimeException(sprintf("Decryption failed. %s",
+                'The payload is invalid.'
+            ));
+        }
+
+        if (!$this->verifyMac($payload)) {
+            throw new \RuntimeException('The MAC is invalid.');
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Verify the MAC
+     *
+     * @param array $payload
+     * @return bool
+     * @throws Exception
+     */
+    protected function verifyMac(array $payload)
+    {
+        $bytes = random_bytes(16);
+
+        $computedMac = hash_hmac(
+            'sha256',
+            $this->hash($payload['iv'], $payload['value']),
+            $bytes, true
+        );
+
+        return hash_equals(
+            hash_hmac('sha256', $payload['mac'], $bytes, true),
+            $computedMac
+        );
+    }
+
+    /**
+     * Verify the encryption payload.
+     *
+     * @param array $payload
+     * @return bool
+     */
+    protected function verifyPayload(array $payload): bool
+    {
+        return isset($payload['iv'], $payload['value'], $payload['mac']) &&
+            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+    }
+
+
 }

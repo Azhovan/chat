@@ -26,7 +26,7 @@ class EncrypterTest extends TestCase
     {
         $message = "plain text message";
 
-        $encrypter = new Encrypter('');
+        $encrypter = new Encrypter('123232');
         $encrypted = $encrypter->encrypt($message);
         $decrypted = $encrypter->decrypt($encrypted);
 
