@@ -30,7 +30,7 @@ class Encrypter implements EncrypterInterface
     public function __construct(string $salt)
     {
         $this->cipher = 'AES-256-CBC';
-        $this->salt = $salt ?? $this->salt();
+        $this->salt = $salt ?? self::salt();
     }
 
 
@@ -86,7 +86,7 @@ class Encrypter implements EncrypterInterface
      * @param mixed $value
      * @return string
      */
-    protected function hash(string $iv, string $value): string
+    private function hash(string $iv, string $value): string
     {
         return hash_hmac('sha256', $iv . $value, $this->salt);
     }
@@ -121,7 +121,7 @@ class Encrypter implements EncrypterInterface
      * @return array
      * @throws Exception
      */
-    protected function getVerifiedPayload(string $payload): array
+    private function getVerifiedPayload(string $payload): array
     {
         $payload = json_decode(base64_decode($payload), true);
 
@@ -145,7 +145,7 @@ class Encrypter implements EncrypterInterface
      * @return bool
      * @throws Exception
      */
-    protected function verifyMac(array $payload)
+    private function verifyMac(array $payload)
     {
         $bytes = random_bytes(16);
 
@@ -167,7 +167,7 @@ class Encrypter implements EncrypterInterface
      * @param array $payload
      * @return bool
      */
-    protected function verifyPayload(array $payload): bool
+    private function verifyPayload(array $payload): bool
     {
         return isset($payload['iv'], $payload['value'], $payload['mac']) &&
             strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
