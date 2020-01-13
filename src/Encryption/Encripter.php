@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Chat\Encryption;
 
 use Exception;
@@ -42,7 +40,7 @@ class Encrypter implements EncrypterInterface
      */
     public static function salt()
     {
-        return random_bytes(32);
+        return getenv('APP_KEY') ?: random_bytes(32);
     }
 
     /**

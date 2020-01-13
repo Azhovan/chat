@@ -8,7 +8,11 @@
     "php": ">=7.2",
     "mockery/mockery": "^1.2",
     "ext-json": "*",
-    "ext-openssl": "*"
+    "ext-openssl": "*",
+    "illuminate/database": "^6.10",
+    "illuminate/events": "^6.10",
+    "vlucas/phpdotenv": "^4.1",
+    "nesbot/carbon": "^2.28"
   },
   "autoload": {
     "psr-4": {
