@@ -13,10 +13,7 @@ class EncrypterTest extends TestCase
     public function can_encrypt_message()
     {
         $encryptedMessage = (new Encrypter(''))->encrypt("plain text message");
-
-        $this->assertNotNull(
-            $encryptedMessage
-        );
+        $this->assertNotNull($encryptedMessage);
     }
 
     /**
@@ -30,8 +27,6 @@ class EncrypterTest extends TestCase
         $encrypted = $encrypter->encrypt($message);
         $decrypted = $encrypter->decrypt($encrypted);
 
-        $this->assertSame(
-            $decrypted, $message
-        );
+        $this->assertSame($decrypted, $message);
     }
 }

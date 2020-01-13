@@ -4,7 +4,6 @@ namespace Tests;
 
 use Chat\Database\Database;
 use Chat\Model\User;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
@@ -23,16 +22,19 @@ class DatabaseTest extends TestCase
         $this->database->establishConnection();
     }
 
-    /** @test */
+    /**
+     * @test 
+     */
     public function can_establish_connection_to_database()
     {
         $this->assertNotNull($this->database);
     }
 
-    /** @test
+    /**
+     * @test
      * @throws \Exception
      */
-    public function insert_data_into()
+    public function can_insert_data_into_tables_use_model()
     {
         User::insert([
             'name' => 'John doe',

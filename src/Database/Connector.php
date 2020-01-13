@@ -39,12 +39,16 @@ class Database
      */
     public function __construct(Capsule $instance = null)
     {
-        // creat an instance of eloquent orm
-        // this object will be configured when only connection established
+        /*
+         * Creat an instance of eloquent orm
+         * This object will be configured when only connection established
+         */
         $this->instance = $instance ?? new Capsule;
 
-        // loading the database attribute from the environment
-        // if env variables have not been set, defaults will be used
+        /*
+         *  Loading the database attribute from the environment
+         *  If env variables have not been set, defaults will be used
+         */
         $this->driver = getenv('DB_CONNECTION') ?: 'sqlite';
         $this->host   = getenv('DB_HOST') ?: 'localhost';
         $this->database = getenv('DB_DATABASE') ?: $this->getDefaultPath();
