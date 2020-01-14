@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Chat\Encryption\Encrypter;
+use Chat\Encryptions\Encrypter;
 use PHPUnit\Framework\TestCase;
 
 class EncrypterTest extends TestCase
