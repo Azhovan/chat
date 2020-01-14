@@ -25,17 +25,17 @@ class AddUserConversationTable extends Migration
             // I'm choosing bigIncrements
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('conversation_id');
             //text looks good enough
             $table->text('message');
             $table->timestamps();
 
             // add index
             $table->index('user_id');
-        });
 
-        // add foreign key
-        Capsule::table('user_conversations', function (Blueprint $table){
+            // add foreign keys
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('conversation_id')->references('id')->on('conversations');
         });
     }
 
