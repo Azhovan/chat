@@ -6,7 +6,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateUserTable extends Migration
+class AddUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,14 +15,22 @@ class CreateUserTable extends Migration
      */
     public function up(): void
     {
-        if (!Capsule::schema()->hasTable('users')) {
-            Capsule::schema()->create('users', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('name');
-                $table->uuid('uuid');
-                $table->timestamps();
-            });
+        // if table exist, ignore this migration
+        if (Capsule::schema()->hasTable('users')) {
+            return;
         }
+
+        Capsule::schema()->create('users', function (Blueprint $table) {
+            // since this table potentially has very high load
+            // I'm choosing bigIncrements
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->uuid('uuid');
+            $table->timestamps();
+
+            // add index
+            $table->index('uuid');
+        });
     }
 
     /**

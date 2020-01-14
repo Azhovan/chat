@@ -14,19 +14,13 @@ class DatabaseTest extends TestCase
      */
     private $database;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->database = new Database();
-        $this->database->establishConnection();
-    }
-
     /**
      * @test 
      */
     public function can_establish_connection_to_database()
     {
+        $this->database = new Database();
+        $this->database->establishConnection();
         $this->assertNotNull($this->database);
     }
 

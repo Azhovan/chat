@@ -52,7 +52,9 @@ class Encrypter implements EncrypterInterface
             openssl_cipher_iv_length($this->cipher)
         );
 
-        // encrypt the value using openssl
+        /*
+         * encrypt the value using openssl
+         */
         $value = \openssl_encrypt(serialize($value), $this->cipher, $this->salt, 0, $iv);
 
         if ($value === false) {
@@ -62,8 +64,10 @@ class Encrypter implements EncrypterInterface
             ));
         }
 
-        // this hash mac will be used to make sure we are decrypting the message
-        // which is encrypted with the previous key
+        /*
+         *  this hash mac will be used to make sure we are decrypting the message
+         *  which is encrypted with the previous key
+         */
         $mac = $this->hash($iv = base64_encode($iv), $value);
 
         $json = json_encode(compact('iv', 'value', 'mac'));
@@ -97,8 +101,7 @@ class Encrypter implements EncrypterInterface
         $payload = $this->getVerifiedPayload($payload);
 
         $iv = base64_decode($payload['iv']);
-
-        // decrypt the payload.
+        
         $decrypted = \openssl_decrypt(
             $payload['value'], $this->cipher, $this->salt, 0, $iv
         );
