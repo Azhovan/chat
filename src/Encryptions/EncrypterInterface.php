@@ -1,6 +1,6 @@
 <?php
 
-namespace Chat\Encryption;
+namespace Chat\Encryptions;
 
 interface EncrypterInterface
 {

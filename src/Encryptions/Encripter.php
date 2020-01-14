@@ -1,5 +1,6 @@
 <?php
-namespace Chat\Encryption;
+
+namespace Chat\Encryptions;
 
 use Exception;
 
@@ -25,22 +26,23 @@ class Encrypter implements EncrypterInterface
      * @param string $salt
      * @throws Exception
      */
-    public function __construct(string $salt)
+    public function __construct(?string $salt)
     {
         $this->cipher = 'AES-256-CBC';
-        $this->salt = $salt ?? self::salt();
+        $this->salt = $salt ?? self::salt(true);
     }
 
 
     /**
      * Create a new salt.
      *
+     * @param bool $useAppKey
      * @return string
      * @throws Exception
      */
-    public static function salt()
+    public static function salt(bool $useAppKey = false)
     {
-        return getenv('APP_KEY') ?: random_bytes(32);
+        return $useAppKey ? getenv('APP_KEY') : random_bytes(32);
     }
 
     /**
@@ -73,7 +75,7 @@ class Encrypter implements EncrypterInterface
         $json = json_encode(compact('iv', 'value', 'mac'));
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException(sprintf("Encryption failed. input: %s reason: %s",
+            throw new \RuntimeException(sprintf("Encryptions failed. input: %s reason: %s",
                 $value, "can not encode message into json."
             ));
         }
@@ -101,7 +103,7 @@ class Encrypter implements EncrypterInterface
         $payload = $this->getVerifiedPayload($payload);
 
         $iv = base64_decode($payload['iv']);
-        
+
         $decrypted = \openssl_decrypt(
             $payload['value'], $this->cipher, $this->salt, 0, $iv
         );
@@ -140,6 +142,18 @@ class Encrypter implements EncrypterInterface
     }
 
     /**
+     * Verify the encryption payload.
+     *
+     * @param array $payload
+     * @return bool
+     */
+    private function verifyPayload(array $payload): bool
+    {
+        return isset($payload['iv'], $payload['value'], $payload['mac']) &&
+            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+    }
+
+    /**
      * Verify the MAC
      *
      * @param array $payload
@@ -160,18 +174,6 @@ class Encrypter implements EncrypterInterface
             hash_hmac('sha256', $payload['mac'], $bytes, true),
             $computedMac
         );
-    }
-
-    /**
-     * Verify the encryption payload.
-     *
-     * @param array $payload
-     * @return bool
-     */
-    private function verifyPayload(array $payload): bool
-    {
-        return isset($payload['iv'], $payload['value'], $payload['mac']) &&
-            strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
     }
 
 
