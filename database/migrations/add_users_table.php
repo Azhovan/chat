@@ -1,12 +1,10 @@
 <?php
 
-namespace Chat\Config\Migrations;
-
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddConversationTable extends Migration
+class AddUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,18 +14,20 @@ class AddConversationTable extends Migration
     public function up(): void
     {
         // if table exist, ignore this migration
-        if (Capsule::schema()->hasTable('conversations')) {
+        if (Capsule::schema()->hasTable('users')) {
             return;
         }
 
-        Capsule::schema()->create('conversations', function (Blueprint $table) {
+        Capsule::schema()->create('users', function (Blueprint $table) {
             // since this table potentially has very high load
             // I'm choosing bigIncrements
             $table->bigIncrements('id');
-            // this key provides end-to-end encryption per conversation
-            // every conversation has it's own encryption key
-            $table->string('encryption_key');
+            $table->string('name');
+            $table->uuid('uuid');
             $table->timestamps();
+
+            // add index
+            $table->index('uuid');
         });
     }
 
@@ -38,7 +38,7 @@ class AddConversationTable extends Migration
      */
     public function down()
     {
-        Capsule::schema()->dropIfExists('conversations');
+        Capsule::schema()->dropIfExists('users');
     }
 
 }

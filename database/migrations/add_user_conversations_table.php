@@ -1,12 +1,10 @@
 <?php
 
-namespace Chat\Config\Migrations;
-
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddUserConversationTable extends Migration
+class AddUserConversationsTable extends Migration
 {
     /**
      * Run the migrations.
