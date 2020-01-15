@@ -21,7 +21,7 @@ class ConversationTest extends TestCase
     }
 
     /** @test */
-    public function conversations_have_different_encryption_key()
+    public function every_created_conversations_has_different_encryption_key()
     {
         $conversation1 = Conversation::init();
         $conversation2 = Conversation::init();
