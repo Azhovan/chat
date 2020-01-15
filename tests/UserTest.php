@@ -91,8 +91,47 @@ class UserTest extends TestCase
         $user->sendMessage($conversation, 'today I need some rest. it was long week');
         $user->sendMessage($conversation, ':)');
 
-        $allConversations = $user->conversations()->get();
+        $allConversations = $user->chats()->get();
         $this->assertCount(3, $allConversations);
+    }
+
+    /** @test
+     */
+    public function users_can_get_their_chat_message_by_ascending_order()
+    {
+        $user1 = User::createNewUser(
+            new UserObject('James Gosling', '1234gh21')
+        );
+        $user2 = User::createNewUser(
+            new UserObject('Ken Thompson', '767pvw111')
+        );
+
+        // initialize the conversation
+        $conversation = Conversation::init();
+
+        $user1->sendMessage($conversation, 'user1 message 1');
+        $user2->sendMessage($conversation, 'user2 message 2');
+        $user1->sendMessage($conversation, 'user1 message 3');
+        $user1->sendMessage($conversation, 'user1 message 4');
+
+        $expected = [
+            ['user_id' => $user1->id, 'message'=> 'user1 message 1'],
+            ['user_id' => $user2->id, 'message'=> 'user2 message 2'],
+            ['user_id' => $user1->id, 'message'=> 'user1 message 3'],
+            ['user_id' => $user1->id, 'message'=> 'user1 message 4'],
+        ];
+
+        $actual = $user1->readMessages($conversation);
+
+        foreach ($expected as $key => $item) {
+            $this->assertSame(
+                $actual[$key]['message'], $item['message']
+            );
+            $this->assertSame(
+                (int)$actual[$key]['user_id'], (int)$item['user_id']
+            );
+        }
+
     }
 
 }

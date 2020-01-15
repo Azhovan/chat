@@ -7,6 +7,7 @@ use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Builder;
 
 class User extends Model
 {
@@ -32,6 +33,8 @@ class User extends Model
     }
 
     /**
+     * Send an encrypted message to given conversation
+     *
      * @param Conversation $conversation
      * @param string $message
      * @return bool
@@ -39,9 +42,9 @@ class User extends Model
      */
     public function sendMessage(Conversation $conversation, string $message): bool
     {
-        $encryptedMessage = EncryptFactory::create($conversation->encryption_key, $message);
+        $encryptedMessage = EncryptFactory::encrypt($conversation->encryption_key, $message);
 
-        return $this->conversations()->insert([
+        return $this->chats()->insert([
             'user_id' => $this->id,
             'conversation_id' => $conversation->id,
             'message' => $encryptedMessage,
@@ -51,13 +54,40 @@ class User extends Model
     }
 
     /**
-     * Every user can have many conversation
+     * Every user may have many chats
      *
      * @return HasMany
      */
-    public function conversations(): HasMany
+    public function chats(): HasMany
     {
         return $this->hasMany(UserConversation::class);
+    }
+
+    /**
+     * Read all messages from a given conversation
+     * This could be a group chat or just one-to-one chat
+     *
+     * @param Conversation $conversation
+     * @return array
+     * @throws \Exception
+     */
+    public function readMessages(Conversation $conversation): array
+    {
+        // fetch all messages which were exchanged during the
+        // conversation between all users
+        $chats = UserConversation::where(function ($query) use ($conversation) {
+            $query->where('conversation_id', $conversation->id);
+        })->orderBy('updated_at')
+            ->get()
+            ->toArray();
+
+        $encryptionKey = $conversation->encryption_key;
+
+        foreach ($chats as $key => $chat) {
+            $chats[$key]['message'] = EncryptFactory::decrypt($encryptionKey, $chat['message']);
+        }
+
+        return $chats;
     }
 
 }
