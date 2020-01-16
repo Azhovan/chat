@@ -7,7 +7,6 @@ use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Builder;
 
 class User extends Model
 {
@@ -22,6 +21,7 @@ class User extends Model
      *
      * @param UserObject $user
      * @return User
+     *
      * @throws \Exception
      */
     public static function createNewUser(UserObject $user): User
@@ -38,6 +38,7 @@ class User extends Model
      * @param Conversation $conversation
      * @param string $message
      * @return bool
+     *
      * @throws \Exception
      */
     public function sendMessage(Conversation $conversation, string $message): bool
@@ -69,25 +70,46 @@ class User extends Model
      *
      * @param Conversation $conversation
      * @return array
+     *
      * @throws \Exception
      */
-    public function readMessages(Conversation $conversation): array
+    public function readMessagesFrom(Conversation $conversation): array
     {
         // fetch all messages which were exchanged during the
-        // conversation between all users
+        // single conversation between all users
+        // result is sorted based on created_at, this lets us have return accurate result even if user will be able
+        // to change the message (if we have edit message feature in our app)
         $chats = UserConversation::where(function ($query) use ($conversation) {
             $query->where('conversation_id', $conversation->id);
-        })->orderBy('updated_at')
+        })->orderBy('created_at')
             ->get()
             ->toArray();
 
-        $encryptionKey = $conversation->encryption_key;
+        // preparing to use it in decryptAll method
+        $chats = array($chats);
+        return EncryptFactory::decryptAll($chats);
+    }
 
-        foreach ($chats as $key => $chat) {
-            $chats[$key]['message'] = EncryptFactory::decrypt($encryptionKey, $chat['message']);
-        }
+    /**
+     * Get all the conversation of user
+     *
+     * @return array|\Illuminate\Support\Collection
+     *
+     * @throws \Exception
+     */
+    public function getConversations(): array
+    {
+        $conversations = $this->chats()
+            ->groupBy('conversation_id')
+            ->get()->pluck('conversation_id');
 
-        return $chats;
+        $chats = UserConversation::whereIn('conversation_id', $conversations)
+            ->orderBy('conversation_id')
+            ->get()
+            ->groupBy('conversation_id')
+            ->toArray();
+
+        return EncryptFactory::decryptAll($chats);
     }
 
 }

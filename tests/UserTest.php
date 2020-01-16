@@ -115,13 +115,15 @@ class UserTest extends TestCase
         $user1->sendMessage($conversation, 'user1 message 4');
 
         $expected = [
-            ['user_id' => $user1->id, 'message'=> 'user1 message 1'],
-            ['user_id' => $user2->id, 'message'=> 'user2 message 2'],
-            ['user_id' => $user1->id, 'message'=> 'user1 message 3'],
-            ['user_id' => $user1->id, 'message'=> 'user1 message 4'],
+            ['user_id' => $user1->id, 'message' => 'user1 message 1'],
+            ['user_id' => $user2->id, 'message' => 'user2 message 2'],
+            ['user_id' => $user1->id, 'message' => 'user1 message 3'],
+            ['user_id' => $user1->id, 'message' => 'user1 message 4'],
         ];
 
-        $actual = $user1->readMessages($conversation);
+        // $actual is array of conversation
+        $actual = $user1->readMessagesFrom($conversation);
+        $actual = array_shift($actual);
 
         foreach ($expected as $key => $item) {
             $this->assertSame(
@@ -131,6 +133,47 @@ class UserTest extends TestCase
                 (int)$actual[$key]['user_id'], (int)$item['user_id']
             );
         }
+    }
+
+    /** @test */
+    public function can_fetch_all_users_conversations()
+    {
+        $user1 = User::createNewUser(
+            new UserObject('James Gosling', '1234gh21')
+        );
+        $user2 = User::createNewUser(
+            new UserObject('Ken Thompson', '767pvw111')
+        );
+        $user3 = User::createNewUser(
+            new UserObject('Rob Pike', 'uuuux123')
+        );
+
+        // conversation between user1 and user2
+        $c1 = Conversation::init();
+        $user1->sendMessage($c1, 'message1');
+        $user2->sendMessage($c1, 'message2');
+
+        // conversation between user1 and user3
+        $c2 = Conversation::init();
+        $user1->sendMessage($c2, 'message1');
+        $user3->sendMessage($c2, 'message2');
+        $user3->sendMessage($c2, 'message2');
+
+        $chats = $user1->getConversations();
+
+        // user1 has two conversation
+        $this->assertCount(2, $chats);
+
+        // examine first chat
+        // two messages
+        $firstChat = array_shift($chats);
+        $this->assertCount(2, $firstChat);
+
+        // examine second chat
+        // three messages
+        $secondChat = array_shift($chats);
+        $this->assertCount(3, $secondChat);
+
 
     }
 
