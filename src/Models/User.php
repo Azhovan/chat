@@ -93,7 +93,7 @@ class User extends Model
     /**
      * Get all the conversation of user
      *
-     * @return array|\Illuminate\Support\Collection
+     * @return array
      *
      * @throws \Exception
      */

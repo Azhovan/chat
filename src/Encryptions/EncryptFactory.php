@@ -13,6 +13,7 @@ class EncryptFactory
      * @param string $encryptionKey
      * @param string $message
      * @return string
+     *
      * @throws \Exception
      */
     public static function encrypt(string $encryptionKey, string $message): string
@@ -51,6 +52,7 @@ class EncryptFactory
      * @param string $encryptionKey
      * @param string $message
      * @return string
+     *
      * @throws \Exception
      */
     public static function decrypt(string $encryptionKey, string $message): string

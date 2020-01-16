@@ -70,7 +70,7 @@ class Database
      * @throws \InvalidArgumentException
      * @return void
      */
-    public function establishConnection(): void
+    public function registerConfiguration(): void
     {
         $this->instance->addConnection([
             'driver' => $this->driver,

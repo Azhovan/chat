@@ -17,7 +17,7 @@ class ConversationTest extends TestCase
     {
         parent::setUp();
         $this->database = new Database();
-        $this->database->establishConnection();
+        $this->database->registerConfiguration();
     }
 
     /** @test */
