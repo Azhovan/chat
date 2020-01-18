@@ -3,35 +3,39 @@
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router as Route;
 
-
+/*
+ *
+ * User API Routes
+ *
+ */
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], function (Route $router) {
-    // Create a user api
-    $router->post('/', 'UserController@create')
-        ->name('users.create');
+    // Create user
+    $router->post('/', 'UserController@create');
 
-    // Get user api
-    $router->get('/', 'UserController@show')
-        ->name('users.get');
+    // Fetch user
+    $router->get('/', 'UserController@show');
 
-    // Get all user's conversations
-    $router->get('/conversations', 'UserController@conversations')
-        ->name('users.conversation');
+    // Fetch all user's conversations
+    // result is grouped based on conversations
+    $router->get('/conversations', 'UserController@conversations');
 });
 
+/*
+ *
+ * Conversation API
+ *
+ */
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'], function (Route $router) {
     // Create a new conversation
-    $router->post('/', 'ConversationController@create')
-        ->name('conversations.create');
+    $router->post('/', 'ConversationController@create');
 
     // Send message to a conversation
     $router->post('/{conversation_id}/messages', 'ConversationController@sendMessage')
-        ->where('user_id', '[0-9]+')
-        ->name('conversations.message.send');
+        ->where('user_id', '[0-9]+');
 
     // Get messages from a specific conversation
    $router->get('{conversation_id}/messages', 'ConversationController@readMessage')
-       ->where('user_id', '[0-9]+')
-       ->name('conversations.get');
+       ->where('user_id', '[0-9]+');
 });
 
 /*
