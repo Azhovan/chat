@@ -76,14 +76,11 @@ class ConversationController extends Controller
 
             if ($validation->fails()) {
                 throw new BadRequestHttpException(
-                    'access_token and message is required'
+                    'access_token and message are required'
                 );
             }
 
-            // if the conversation does not exist, immediately fail
-            if (!$conversation = Conversation::find($id)) {
-                throw new ModelNotFoundException('invalid conversation id is given.');
-            }
+            $conversation = $this->getValidConversation($id);
 
             // fetch the user by token
             // token is user identifier (uuid or id)
@@ -102,6 +99,50 @@ class ConversationController extends Controller
         } catch (InvalidArgumentException |ModelNotFoundException | BadRequestHttpException $e) {
             return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    public function readMessage(Request $request, int $id): Response
+    {
+        try {
+            $validation = $this->validate($request->all(), [
+                'access_token' => 'required',
+            ]);
+
+            if ($validation->fails()) {
+                throw new BadRequestHttpException(
+                    'access_token is required'
+                );
+            }
+
+           $conversation = $this->getValidConversation($id);
+
+            // fetch the user by token
+            // token is user identifier (uuid or id)
+            $user = User::searchBy($request->get('access_token'));
+            $messages = $user->readMessagesFrom($conversation);
+
+            // message object is returned
+            return $this->response(
+                $this->messageTransformer->transform($messages)
+            );
+
+        } catch (InvalidArgumentException |ModelNotFoundException | BadRequestHttpException $e) {
+            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+    }
+
+    /**
+     * @param int $id
+     * @return Conversation
+     */
+    private function getValidConversation(int $id): Conversation
+    {
+        if (!$conversation = Conversation::find($id)) {
+            throw new ModelNotFoundException('invalid conversation id is given.');
+        }
+
+        return $conversation;
     }
 
 }

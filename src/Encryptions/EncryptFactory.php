@@ -4,9 +4,20 @@ namespace Chat\Encryptions;
 
 
 use Chat\Models\Conversation;
+use Chat\Models\User;
 
 class EncryptFactory
 {
+
+    /**
+     * A Hash-Map of users in a conversation.
+     * this data structure helps us to reduce the number of queries which we need to find the information
+     * about the messages in large conversation
+     *
+     * @var array
+     */
+    private static $usersHashmap;
+
     /**
      * Encrypt a message with encryption key
      *
@@ -40,6 +51,8 @@ class EncryptFactory
             // decrypt every single message
             foreach ($messages as &$message) {
                 $message['message'] = EncryptFactory::decrypt($encryptionKey, $message['message']);
+                $user = self::extractUserName($message['user_id']);
+                $message['user_name'] = $user;
             }
         }
 
@@ -59,6 +72,19 @@ class EncryptFactory
     {
         $encryption = new Encrypter($encryptionKey);
         return $encryption->decrypt($message);
+    }
+
+    /**
+     * @param int $userId
+     * @return string
+     */
+    private static function extractUserName(int $userId): string
+    {
+        if (isset(self::$usersHashmap[$userId])) {
+            return self::$usersHashmap[$userId];
+        }
+        $user = User::searchBy($userId)->name;
+        return self::$usersHashmap[$userId] = $user;
     }
 
     /**

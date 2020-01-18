@@ -93,7 +93,7 @@ class User extends Model
     public function readMessagesFrom(Conversation $conversation): array
     {
         // fetch all messages which were exchanged during the
-        // single conversation between all users
+        // single conversation between all users in single conversation
         // result is sorted based on created_at, this lets us have return accurate result even if user will be able
         // to change the message (if we have edit message feature in our bootstrap)
         $chats = UserConversation::where(function (Builder $query) use ($conversation) {

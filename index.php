@@ -19,7 +19,7 @@ $router = new Illuminate\Routing\Router($events, $container);
 require_once __DIR__ . '/routes/api.php';
 
 // Load database configuration
-$database = new Chat\Database\Database();
+$database = new \Chat\Database\Database();
 $database->registerConfiguration();
 
 /*

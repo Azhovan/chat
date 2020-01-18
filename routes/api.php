@@ -29,8 +29,14 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'],
         ->name('conversations.create');
 
     // Send message to a conversation
-    $router->post('/{id}/messages', 'ConversationController@sendMessage')
+    $router->post('/{conversation_id}/messages', 'ConversationController@sendMessage')
+        ->where('user_id', '[0-9]+')
         ->name('conversations.message.send');
+
+    // Get messages from a conversation
+   $router->get('{conversation_id}/messages', 'ConversationController@readMessage')
+       ->where('user_id', '[0-9]+')
+       ->name('conversations.get');
 
 });
 

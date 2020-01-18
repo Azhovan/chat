@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property $message
  * @property $created_at
  * @property $updated_at
+ *
  */
 class UserConversation extends Model
 {
@@ -30,6 +31,16 @@ class UserConversation extends Model
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
+    }
+
+    /**
+     *  Every conversation(single message) belongs to only one user
+     *
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
 }
