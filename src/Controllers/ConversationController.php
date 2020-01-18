@@ -45,16 +45,43 @@ class ConversationController extends Controller
     /**
      * Create a new conversation
      *
+     * @param Request $request
      * @return Response
      * @throws Exception
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        $conversation = Conversation::init();
+        try {
+            $this->validateUser($request);
 
-        return $this->response(
-            ($this->conversationTransformer)->transform($conversation)
-        );
+            $conversation = Conversation::init();
+
+            return $this->response(
+                ($this->conversationTransformer)->transform($conversation),
+                Response::HTTP_CREATED
+            );
+        } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
+            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return User
+     */
+    private function validateUser(Request $request): User
+    {
+        $validation = $this->validate($request->all(), [
+            'access_token' => 'required',
+        ]);
+
+        if ($validation->fails()) {
+            throw new BadRequestHttpException(
+                'access_token are required'
+            );
+        }
+
+        return User::searchBy($request->get('access_token'));
     }
 
     /**
@@ -96,46 +123,9 @@ class ConversationController extends Controller
                 $this->messageTransformer->transform($message)
             );
 
-        } catch (InvalidArgumentException |ModelNotFoundException | BadRequestHttpException $e) {
+        } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
             return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
-    }
-
-    /**
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     * @throws Exception
-     */
-    public function readMessage(Request $request, int $id): Response
-    {
-        try {
-            $validation = $this->validate($request->all(), [
-                'access_token' => 'required',
-            ]);
-
-            if ($validation->fails()) {
-                throw new BadRequestHttpException(
-                    'access_token is required'
-                );
-            }
-
-           $conversation = $this->getValidConversation($id);
-
-            // fetch the user by token
-            // token is user identifier (uuid or id)
-            $user = User::searchBy($request->get('access_token'));
-            $messages = $user->readMessagesFrom($conversation);
-
-            // message object is returned
-            return $this->response(
-                $this->messageTransformer->transform($messages)
-            );
-
-        } catch (InvalidArgumentException |ModelNotFoundException | BadRequestHttpException $e) {
-            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
-        }
-
     }
 
     /**
@@ -149,6 +139,39 @@ class ConversationController extends Controller
         }
 
         return $conversation;
+    }
+
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     * @throws Exception
+     */
+    public function readMessage(Request $request, int $id): Response
+    {
+        try {
+            if (!$request->header('Authorization')) {
+                throw new BadRequestHttpException(
+                    'Authorization token is required'
+                );
+            }
+
+            $conversation = $this->getValidConversation($id);
+
+            // fetch the user by token
+            // token is user identifier (uuid or id)
+            $user = User::searchBy($request->header('Authorization'));
+            $messages = $user->readMessagesFrom($conversation);
+
+            // message object is returned
+            return $this->response(
+                $this->messageTransformer->transform($messages)
+            );
+
+        } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
+            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
     }
 
 }

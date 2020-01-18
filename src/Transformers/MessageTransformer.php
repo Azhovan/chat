@@ -7,22 +7,6 @@ use Chat\Models\UserConversation;
 
 class MessageTransformer extends BaseTransformer
 {
-    /**
-     * @param UserConversation|array $message
-     * @return array
-     *
-     * @throws \Exception
-     */
-    public function transform($message): array
-    {
-        // one single message
-        // in this case I will wrap the data into proper format
-        if ($message instanceof UserConversation) {
-            return $this->getMessageBag($message);
-        }
-
-        return $message;
-    }
 
     /**
      * @param UserConversation $message
@@ -43,6 +27,21 @@ class MessageTransformer extends BaseTransformer
         ];
     }
 
+    /**
+     * @param UserConversation|array $message
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function transform($message): array
+    {
+        // one single message
+        // in this case I will wrap the data into proper format
+        if ($message instanceof UserConversation) {
+            return $this->getMessageBag($message);
+        }
 
+        return array_shift($message);
+    }
 }
 

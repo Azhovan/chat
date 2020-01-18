@@ -14,6 +14,9 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], functio
     $router->get('/{user_id}', 'UserController@show')
         ->where('user_id', '[0-9]+')
         ->name('users.get');
+
+    // Get all user's conversations
+    $router->get('/conversations', 'UserController@conversations');
 });
 
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'], function (Route $router) {
@@ -26,7 +29,7 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'],
         ->where('user_id', '[0-9]+')
         ->name('conversations.message.send');
 
-    // Get messages from a conversation
+    // Get messages from a specific conversation
    $router->get('{conversation_id}/messages', 'ConversationController@readMessage')
        ->where('user_id', '[0-9]+')
        ->name('conversations.get');
