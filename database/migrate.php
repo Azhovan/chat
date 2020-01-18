@@ -1,7 +1,7 @@
 <?php
 // This command will set up the database by running the all migrations
 // migration files are exist in ./database/migrations directory
-require __DIR__. "/vendor/autoload.php";
+require __DIR__ . "/../vendor/autoload.php";
 
 use Chat\Database\Database;
 use Dotenv\Dotenv;
@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem as Storage;
 // Loads environment variables from .env
 // by this line all environment variables will be
 // available when getenv() triggered
-$env = Dotenv::createImmutable(__DIR__);
+$env = Dotenv::createImmutable(__DIR__ .'/../');
 $env->load();
 
 // Load database configuration

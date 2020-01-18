@@ -2,6 +2,7 @@
 
 namespace Chat\Controllers;
 
+use Chat\Controllers\Traits\InteractsWithAuthorizedUser;
 use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Chat\Models\User;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UserController extends Controller
 {
+    use InteractsWithAuthorizedUser;
+
     /**
      * Default name for user if no name passed.
      *
@@ -41,12 +44,12 @@ class UserController extends Controller
      * UserController constructor.
      *
      * @param UserTransformer $transformer
-     * @param MessageTransformer|null $msgTransfer
+     * @param MessageTransformer $msgTransfer
      */
-    public function __construct(?UserTransformer $transformer, ?MessageTransformer $msgTransfer)
+    public function __construct(UserTransformer $transformer, MessageTransformer $msgTransfer)
     {
-        $this->transformer = $transformer ?? new UserTransformer;
-        $this->messageTransformer = $msgTransfer ?? new MessageTransformer;
+        $this->transformer = $transformer;
+        $this->messageTransformer = $msgTransfer;
     }
 
     /**
@@ -104,9 +107,7 @@ class UserController extends Controller
         try {
             $user = $this->getAuthorizedUser($request);
             $messages = $user->getConversations();
-
             return $this->response($messages);
-
         } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
             return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }

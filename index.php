@@ -1,8 +1,6 @@
 <?php
 
-use Chat\Database\Database;
-
-require_once "vendor/autoload.php";
+require_once __DIR__ . "/vendor/autoload.php";
 
 /*
  * Create a service container
@@ -18,11 +16,11 @@ $container->instance('Illuminate\Http\Request', $request);
  */
 $events = new Illuminate\Events\Dispatcher($container);
 $router = new Illuminate\Routing\Router($events, $container);
-require_once __DIR__ . '/routes/api.php';
 
-// Load database configuration
-$database = new Database();
-$database->registerConfiguration();
+// Load routes
+require_once __DIR__ . '/routes/api.php';
+// Load providers
+require_once __DIR__ . '/bootstrap/providers.php';
 
 /*
  * Dispatch the request through the router

@@ -3,6 +3,7 @@
 namespace Chat\Controllers;
 
 
+use Chat\Controllers\Traits\InteractsWithAuthorizedUser;
 use Chat\Models\Conversation;
 use Chat\Models\User;
 use Chat\Transformers\ConversationTransformer;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ConversationController extends Controller
 {
+    use InteractsWithAuthorizedUser;
+
     /**
      * Data wrapper for user.
      *
@@ -37,9 +40,8 @@ class ConversationController extends Controller
      */
     public function __construct(MessageTransformer $msgTransformer, ConversationTransformer $csnTransformer)
     {
-        //Todo add these transformers to container
-        $this->messageTransformer = $msgTransformer ?? new MessageTransformer;
-        $this->conversationTransformer = $csnTransformer ?? new ConversationTransformer;
+        $this->messageTransformer = $msgTransformer;
+        $this->conversationTransformer = $csnTransformer;
     }
 
     /**

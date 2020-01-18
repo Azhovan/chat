@@ -10,7 +10,6 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], functio
         ->name('users.create');
 
     // Get user api
-    // id can be user id in or user uuid
     $router->get('/', 'UserController@show')
         ->name('users.get');
 

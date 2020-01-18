@@ -60,21 +60,6 @@ abstract class Controller
     }
 
     /**
-     * @param Request $request
-     * @return User
-     */
-    protected function getAuthorizedUser(Request $request): User
-    {
-        if (!$identifier = $request->header('Authorization')) {
-            throw new BadRequestHttpException(
-                'Authorization is required'
-            );
-        }
-
-        return User::searchBy($identifier);
-    }
-
-    /**
      * Validate data based on the input rules
      *
      * @param array $data
