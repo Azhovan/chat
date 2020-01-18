@@ -3,13 +3,16 @@
 namespace Chat\Controllers;
 
 use BadMethodCallException;
+use Chat\Models\User;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\Validator;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 abstract class Controller
 {
@@ -54,6 +57,21 @@ abstract class Controller
     public function response(array $content = [], int $code = 200, array $headers = []): Response
     {
         return Response::create($content, $code, $headers);
+    }
+
+    /**
+     * @param Request $request
+     * @return User
+     */
+    protected function getAuthorizedUser(Request $request): User
+    {
+        if (!$identifier = $request->header('Authorization')) {
+            throw new BadRequestHttpException(
+                'Authorization is required'
+            );
+        }
+
+        return User::searchBy($identifier);
     }
 
     /**

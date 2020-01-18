@@ -11,12 +11,12 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], functio
 
     // Get user api
     // id can be user id in or user uuid
-    $router->get('/{user_id}', 'UserController@show')
-        ->where('user_id', '[0-9]+')
+    $router->get('/', 'UserController@show')
         ->name('users.get');
 
     // Get all user's conversations
-    $router->get('/conversations', 'UserController@conversations');
+    $router->get('/conversations', 'UserController@conversations')
+        ->name('users.conversation');
 });
 
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'], function (Route $router) {

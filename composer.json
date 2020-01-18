@@ -30,7 +30,7 @@
   },
   "scripts": {
     "tests": "vendor/bin/phpunit",
-    "run" : " $(which php) -S localhost:8002",
+    "run" : " $(which php) -S localhost:8000",
     "setup" : "$(which php) setup.php",
     "build" : " $(which composer) dump-autoload -o"
   }

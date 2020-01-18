@@ -5,11 +5,14 @@ namespace Chat\Controllers;
 use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Chat\Models\User;
+use Chat\Transformers\MessageTransformer;
 use Chat\Transformers\UserTransformer;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use InvalidArgumentException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UserController extends Controller
 {
@@ -28,14 +31,22 @@ class UserController extends Controller
     private $transformer;
 
     /**
+     * Data wrapper for user.
+     *
+     * @var MessageTransformer
+     */
+    private $messageTransformer;
+
+    /**
      * UserController constructor.
      *
      * @param UserTransformer $transformer
+     * @param MessageTransformer|null $msgTransfer
      */
-    public function __construct(?UserTransformer $transformer)
+    public function __construct(?UserTransformer $transformer, ?MessageTransformer $msgTransfer)
     {
-        //Todo: add this to the container
-        $this->transformer = $transformer ?? new UserTransformer();
+        $this->transformer = $transformer ?? new UserTransformer;
+        $this->messageTransformer = $msgTransfer ?? new MessageTransformer;
     }
 
     /**
@@ -61,14 +72,16 @@ class UserController extends Controller
     /**
      * Fetch user information by an identifier (id or uuid)
      *
-     * @param int $identifier
+     * @param Request $request
      * @return Response
      */
-    public function show(int $identifier): Response
+    public function show(Request $request): Response
     {
         try {
-
-            $user = User::searchBy($identifier);
+            // fetch the user by token
+            // token is user identifier (uuid or id)
+            // if user not found, error will be returned
+            $user = $this->getAuthorizedUser($request);
 
             return $this->response(
                 $this->transformer->transform($user)
@@ -78,6 +91,24 @@ class UserController extends Controller
             return $this->response(
                 [], Response::HTTP_BAD_REQUEST
             );
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws Exception
+     */
+    public function conversations(Request $request): Response
+    {
+        try {
+            $user = $this->getAuthorizedUser($request);
+            $messages = $user->getConversations();
+
+            return $this->response($messages);
+
+        } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
+            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 

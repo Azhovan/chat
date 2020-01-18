@@ -1,5 +1,7 @@
 <?php
 
+use Chat\Database\Database;
+
 require_once "vendor/autoload.php";
 
 /*
@@ -19,7 +21,7 @@ $router = new Illuminate\Routing\Router($events, $container);
 require_once __DIR__ . '/routes/api.php';
 
 // Load database configuration
-$database = new \Chat\Database\Database();
+$database = new Database();
 $database->registerConfiguration();
 
 /*

@@ -30,7 +30,11 @@ class UserControllerTest extends TestCase
             new UserObject('new user name', '123456789')
         );
 
-        $response = $this->httpClient->get("/users/" . $user->id);
+        $response = $this->httpClient->get("/users/",[
+            'headers' => [
+                'Authorization' => $user->id
+            ]
+        ]);
         $data = json_decode($response->getBody()->getContents(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -68,7 +72,11 @@ class UserControllerTest extends TestCase
     public function if_user_does_not_exist_404_is_returned()
     {
         $this->expectException(\GuzzleHttp\Exception\ClientException::class);
-        $response = $this->httpClient->get("/users/2323232");
+        $response = $this->httpClient->get("/users",[
+            'headers' => [
+                'Authorization' => 2323232
+            ]
+        ]);
 
         $this->assertEquals(400, $response->getStatusCode());
     }

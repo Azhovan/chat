@@ -52,37 +52,22 @@ class ConversationController extends Controller
     public function create(Request $request): Response
     {
         try {
-            $this->validateUser($request);
+            $this->getAuthorizedUser($request);
 
             $conversation = Conversation::init();
 
             return $this->response(
-                ($this->conversationTransformer)->transform($conversation),
+                $this->conversationTransformer->transform($conversation),
                 Response::HTTP_CREATED
             );
         } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
-            return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @return User
-     */
-    private function validateUser(Request $request): User
-    {
-        $validation = $this->validate($request->all(), [
-            'access_token' => 'required',
-        ]);
-
-        if ($validation->fails()) {
-            throw new BadRequestHttpException(
-                'access_token are required'
+            return $this->response(
+                [$e->getMessage()],
+                Response::HTTP_BAD_REQUEST
             );
         }
-
-        return User::searchBy($request->get('access_token'));
     }
+
 
     /**
      * Send message to a conversation
@@ -97,21 +82,19 @@ class ConversationController extends Controller
     {
         try {
             $validation = $this->validate($request->all(), [
-                'access_token' => 'required',
                 'message' => 'required'
             ]);
 
             if ($validation->fails()) {
                 throw new BadRequestHttpException(
-                    'access_token and message are required'
+                    'message field is required'
                 );
             }
-
-            $conversation = $this->getValidConversation($id);
-
             // fetch the user by token
             // token is user identifier (uuid or id)
-            $user = User::searchBy($request->get('access_token'));
+            // if user not found, error will be returned
+            $user = $this->getAuthorizedUser($request);
+            $conversation = $this->getValidConversation($id);
 
             // send the message to conversation
             $message = $user->sendMessage(
@@ -135,9 +118,10 @@ class ConversationController extends Controller
     private function getValidConversation(int $id): Conversation
     {
         if (!$conversation = Conversation::find($id)) {
-            throw new ModelNotFoundException('invalid conversation id is given.');
+            throw new ModelNotFoundException(sprintf('invalid conversation id is given: %d',
+                $id
+            ));
         }
-
         return $conversation;
     }
 
@@ -150,17 +134,11 @@ class ConversationController extends Controller
     public function readMessage(Request $request, int $id): Response
     {
         try {
-            if (!$request->header('Authorization')) {
-                throw new BadRequestHttpException(
-                    'Authorization token is required'
-                );
-            }
-
-            $conversation = $this->getValidConversation($id);
-
             // fetch the user by token
             // token is user identifier (uuid or id)
-            $user = User::searchBy($request->header('Authorization'));
+            // if user not found, error will be returned
+            $user = $this->getAuthorizedUser($request);
+            $conversation = $this->getValidConversation($id);
             $messages = $user->readMessagesFrom($conversation);
 
             // message object is returned
@@ -171,7 +149,6 @@ class ConversationController extends Controller
         } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
             return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
-
     }
 
 }
