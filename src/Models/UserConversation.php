@@ -29,7 +29,7 @@ class UserConversation extends Model
      */
     public function conversation(): BelongsTo
     {
-        return $this->belongsTo(Conversation::class, 'conversation_id');
+        return $this->belongsTo(Conversation::class);
     }
 
 }

@@ -30,7 +30,7 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'],
 
     // Send message to a conversation
     $router->post('/{id}/messages', 'ConversationController@sendMessage')
-        ->name('conversations.send.message');
+        ->name('conversations.message.send');
 
 });
 

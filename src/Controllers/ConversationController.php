@@ -75,7 +75,9 @@ class ConversationController extends Controller
             ]);
 
             if ($validation->fails()) {
-                throw new BadRequestHttpException('access_token and message is required');
+                throw new BadRequestHttpException(
+                    'access_token and message is required'
+                );
             }
 
             // if the conversation does not exist, immediately fail
@@ -88,12 +90,16 @@ class ConversationController extends Controller
             $user = User::searchBy($request->get('access_token'));
 
             // send the message to conversation
-            $message = $user->sendMessage($conversation, $request->get('message'));
+            $message = $user->sendMessage(
+                $conversation, $request->get('message')
+            );
 
             // message object is returned
-            return $this->response($this->messageTransformer->transform($message));
+            return $this->response(
+                $this->messageTransformer->transform($message)
+            );
 
-        } catch (InvalidArgumentException | ModelNotFoundException | BadRequestHttpException $e) {
+        } catch (InvalidArgumentException |ModelNotFoundException | BadRequestHttpException $e) {
             return $this->response([$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }

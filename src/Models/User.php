@@ -7,6 +7,7 @@ use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 
@@ -137,10 +138,16 @@ class User extends Model
      */
     public static function searchBy(string $identifier): User
     {
-        return User::where(function (Builder $query) use ($identifier) {
+        $user  = User::where(function (Builder $query) use ($identifier) {
             $query->where('id', (int)$identifier);
             $query->orWhere('uuid', $identifier);
-        })->firstOrFail();
+        })->first();
+
+        if (!$user) {
+            throw new ModelNotFoundException('user not found');
+        }
+
+        return $user;
     }
 
 }
