@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Units;
 
 use Chat\Encryptions\Encrypter;
 use PHPUnit\Framework\TestCase;

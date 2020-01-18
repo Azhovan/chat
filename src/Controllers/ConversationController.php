@@ -101,6 +101,12 @@ class ConversationController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return Response
+     * @throws Exception
+     */
     public function readMessage(Request $request, int $id): Response
     {
         try {

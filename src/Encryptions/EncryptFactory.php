@@ -88,14 +88,14 @@ class EncryptFactory
     }
 
     /**
-     * Generate secure random bytes
+     * Generate secure random unique id
      *
      * @return string
      * @throws \Exception
      */
     public static function generateUuid(): string
     {
-        return Encrypter::salt(false);
+        return uniqid();
     }
 
 }

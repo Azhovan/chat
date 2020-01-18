@@ -18,7 +18,7 @@ class UserController extends Controller
      *
      * @var string
      */
-    private const DEFAULT_NAME = 'unknown';
+    private const ANONYMOUS_NAME = 'anonymous';
 
     /**
      * Data wrapper for user.
@@ -46,7 +46,7 @@ class UserController extends Controller
      */
     public function create(Request $request): Response
     {
-        $name = $request->get('name') ?? self::DEFAULT_NAME;
+        $name = $request->get('name') ?? self::ANONYMOUS_NAME;
         $uuid = $request->get('uuid') ?? EncryptFactory::generateUuid();
 
         $user = User::createNewUser(

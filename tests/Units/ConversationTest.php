@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Units;
 
 use Chat\Database\Database;
 use Chat\Models\Conversation;

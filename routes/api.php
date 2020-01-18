@@ -5,7 +5,6 @@ use Illuminate\Routing\Router as Route;
 
 
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], function (Route $router) {
-
     // Create a user api
     $router->post('/', 'UserController@create')
         ->name('users.create');
@@ -15,15 +14,9 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], functio
     $router->get('/{user_id}', 'UserController@show')
         ->where('user_id', '[0-9]+')
         ->name('users.get');
-
-    // GET /users
-    // GET /users_by_ids
-    // Send a Message to an other user
-    //$router->post('/message')
 });
 
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'], function (Route $router) {
-
     // Create a new conversation
     $router->post('/', 'ConversationController@create')
         ->name('conversations.create');
@@ -37,7 +30,6 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'],
    $router->get('{conversation_id}/messages', 'ConversationController@readMessage')
        ->where('user_id', '[0-9]+')
        ->name('conversations.get');
-
 });
 
 /*
