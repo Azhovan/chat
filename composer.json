@@ -16,7 +16,8 @@
     "illuminate/filesystem": "^6.11",
     "illuminate/http": "6.11.*",
     "illuminate/routing": "^6.11",
-    "league/fractal": "^0.18.0"
+    "league/fractal": "^0.18.0",
+    "illuminate/validation": "^6.11"
   },
   "autoload": {
     "psr-4": {
@@ -28,7 +29,8 @@
   },
   "scripts": {
     "tests": "vendor/bin/phpunit",
-    "run" : " composer dump-autoload -o && php -S localhost:8001",
-    "setup" : "$(which php) setup.php"
+    "run" : " $(which php) -S localhost:8002",
+    "setup" : "$(which php) setup.php",
+    "build" : " $(which composer) dump-autoload -o"
   }
 }

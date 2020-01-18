@@ -6,10 +6,19 @@ use Chat\Encryptions\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Conversation
+ * @package Chat\Models
+ *
+ * @property $id
+ * @property $encryption_key
+ * @property $created_at
+ * @property $updated_at
+ */
 class Conversation extends Model
 {
     /**
-     * @inherit
+     * @inheritdoc
      */
     protected $guarded = ['id'];
 
@@ -35,5 +44,6 @@ class Conversation extends Model
     {
         $this->belongsTo(UserConversation::class);
     }
+
 
 }

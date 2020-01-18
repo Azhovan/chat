@@ -23,10 +23,20 @@ class UserTransformer extends TransformerAbstract
     public function transform(User $user): array
     {
         return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'created_at' => Carbon::parse($user->created_at)->format('Y-m-d h:i:s')
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'created_at' => $this->formatDate($user->created_at),
+            'updated_at' => $this->formatDate($user->updated_at)
         ];
+    }
+
+    /**
+     * @param string $date
+     * @return string
+     */
+    private function formatDate(string $date): string
+    {
+        return Carbon::parse($date)->format('Y-m-d h:i:s');
     }
 
 //    public function includeConversations(User $user)

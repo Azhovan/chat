@@ -61,4 +61,15 @@ class EncryptFactory
         return $encryption->decrypt($message);
     }
 
+    /**
+     * Generate secure random bytes
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public static function generateUuid(): string
+    {
+        return Encrypter::salt(false);
+    }
+
 }

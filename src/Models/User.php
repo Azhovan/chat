@@ -5,9 +5,21 @@ namespace Chat\Models;
 use Carbon\Carbon;
 use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Prophecy\Exception\Doubler\MethodNotFoundException;
 
+/**
+ * Class User
+ * @package Chat\Models
+ *
+ * @property $name
+ * @property $id
+ * @property $uuid
+ * @property $created_at
+ * @property $updated_at
+ */
 class User extends Model
 {
 
@@ -37,15 +49,19 @@ class User extends Model
      *
      * @param Conversation $conversation
      * @param string $message
-     * @return bool
+     * @return UserConversation|Model
      *
      * @throws \Exception
      */
-    public function sendMessage(Conversation $conversation, string $message): bool
+    public function sendMessage(Conversation $conversation, string $message): UserConversation
     {
+        if (empty($message)) {
+            throw new \InvalidArgumentException('message can not be empty');
+        }
+
         $encryptedMessage = EncryptFactory::encrypt($conversation->encryption_key, $message);
 
-        return $this->chats()->insert([
+        return $this->chats()->create([
             'user_id' => $this->id,
             'conversation_id' => $conversation->id,
             'message' => $encryptedMessage,
@@ -78,8 +94,8 @@ class User extends Model
         // fetch all messages which were exchanged during the
         // single conversation between all users
         // result is sorted based on created_at, this lets us have return accurate result even if user will be able
-        // to change the message (if we have edit message feature in our app)
-        $chats = UserConversation::where(function ($query) use ($conversation) {
+        // to change the message (if we have edit message feature in our bootstrap)
+        $chats = UserConversation::where(function (Builder $query) use ($conversation) {
             $query->where('conversation_id', $conversation->id);
         })->orderBy('created_at')
             ->get()
@@ -110,6 +126,21 @@ class User extends Model
             ->toArray();
 
         return EncryptFactory::decryptAll($chats);
+    }
+
+    /**
+     * Search by an identifier
+     *
+     * @param string $identifier
+     * @return User
+     * @throws MethodNotFoundException
+     */
+    public static function searchBy(string $identifier): User
+    {
+        return User::where(function (Builder $query) use ($identifier) {
+            $query->where('id', (int)$identifier);
+            $query->orWhere('uuid', $identifier);
+        })->firstOrFail();
     }
 
 }
