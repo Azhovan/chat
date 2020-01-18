@@ -13,6 +13,11 @@ $providers = [
     'Chat\Transformers\ConversationTransformer' => ConversationTransformer::class,
 ];
 
+// If container is not loaded(when running unit tests) then
+// create new instance
+if (is_null($container)) {
+    $container = new Illuminate\Container\Container;
+}
 // Binding services into the container
 // all of these services will be auto-injected during the runtime
 // as a dependency inside of the controller's constructor
