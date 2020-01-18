@@ -22,7 +22,7 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'users'], functio
 
 /*
  *
- * Conversation API
+ * Conversation API Routes
  *
  */
 $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'], function (Route $router) {
@@ -39,7 +39,9 @@ $router->group(['namespace' => 'Chat\Controllers', 'prefix' => 'conversations'],
 });
 
 /*
- * Catch undefined routes.
+ *
+ * Catch Undefined Routes.
+ *
  */
 $router->any('{any}', function () {
     return Response::create(

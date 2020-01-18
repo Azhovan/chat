@@ -48,6 +48,6 @@ class UserObject
      */
     public function getUuid(): string
     {
-        return $this->uuid ?? random_bytes(16);
+        return $this->uuid ?? uniqid();
     }
 }

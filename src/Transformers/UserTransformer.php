@@ -2,19 +2,10 @@
 
 namespace Chat\Transformers;
 
-use Carbon\Carbon;
 use Chat\Models\User;
-use League\Fractal\TransformerAbstract;
 
-class UserTransformer extends TransformerAbstract
+class UserTransformer extends BaseTransformer
 {
-
-    /**
-     * @var array
-     */
-    protected $availableIncludes = [
-        'conversations'
-    ];
 
     /**
      * @param User $user
@@ -30,19 +21,4 @@ class UserTransformer extends TransformerAbstract
             'updated_at' => $this->formatDate($user->updated_at)
         ];
     }
-
-    /**
-     * @param string $date
-     * @return string
-     */
-    private function formatDate(string $date): string
-    {
-        return Carbon::parse($date)->format('Y-m-d h:i:s');
-    }
-
-//    public function includeConversations(User $user)
-//    {
-//        return $this->item($user->getConversations());
-//    }
-
 }
