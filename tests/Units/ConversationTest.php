@@ -8,17 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class ConversationTest extends TestCase
 {
-    /**
-     * @var Database
-     */
-    private $database;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->database = new Database();
-        $this->database->registerConfiguration();
-    }
 
     /** @test */
     public function every_created_conversations_has_different_encryption_key()

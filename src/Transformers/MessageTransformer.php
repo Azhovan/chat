@@ -9,6 +9,23 @@ class MessageTransformer extends BaseTransformer
 {
 
     /**
+     * @param UserConversation|array $message
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function transform($message): array
+    {
+        // one single message
+        // in this case I will wrap the data into proper format
+        if ($message instanceof UserConversation) {
+            return $this->getMessageBag($message);
+        }
+
+        return is_array($message) ? array_shift($message) : [];
+    }
+
+    /**
      * @param UserConversation $message
      * @return array
      * @throws \Exception
@@ -25,23 +42,6 @@ class MessageTransformer extends BaseTransformer
             'created_at' => $this->formatDate($message->created_at),
             'updated_at' => $this->formatDate($message->updated_at)
         ];
-    }
-
-    /**
-     * @param UserConversation|array $message
-     * @return array
-     *
-     * @throws \Exception
-     */
-    public function transform($message): array
-    {
-        // one single message
-        // in this case I will wrap the data into proper format
-        if ($message instanceof UserConversation) {
-            return $this->getMessageBag($message);
-        }
-
-        return array_shift($message);
     }
 }
 

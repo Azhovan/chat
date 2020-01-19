@@ -5,7 +5,6 @@ namespace Chat\Controllers;
 
 use Chat\Controllers\Traits\InteractsWithAuthorizedUser;
 use Chat\Models\Conversation;
-use Chat\Models\User;
 use Chat\Transformers\ConversationTransformer;
 use Chat\Transformers\MessageTransformer;
 use Exception;
