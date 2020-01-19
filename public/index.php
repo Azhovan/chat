@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/vendor/autoload.php";
+require_once __DIR__ . "./../vendor/autoload.php";
 
 /*
  * Create a service container
@@ -18,9 +18,9 @@ $events = new Illuminate\Events\Dispatcher($container);
 $router = new Illuminate\Routing\Router($events, $container);
 
 // Load routes
-require_once __DIR__ . '/routes/api.php';
+require_once __DIR__ . './../routes/api.php';
 // Load providers
-require_once __DIR__ . '/bootstrap/providers.php';
+require_once __DIR__ . '/../bootstrap/providers.php';
 
 /*
  * Dispatch the request through the router
