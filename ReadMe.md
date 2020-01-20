@@ -27,7 +27,7 @@
 
 
 ### Solution
-- Two or more persons (group chat) can Send/Receive messages through a `conversation` to each other.
+- Two or more persons (single/group chat) can Send/Receive messages through a `conversation` to each other.
 - Every conversation is **secured** by an `encryption key` (using OpenSSL), means that each conversation has different encryption key.
 - encrypted messages are signed using a `message authentication code (MAC)` so that their underlying value can not be modified once encrypted.
 
@@ -45,11 +45,11 @@
 ### Application design
 These layers are implemented 
 
-    - **Models**: services and relations between models are defined in this layer (src/Models/ folder)
-    - **Controllers**: navigating/pre-processing the http requests (src/Controllers/ foder)
-    - **Transformers**: data decorators, which are best place to modify the Model's data before returning it(data) to the user (src/Transformers/ folder)
-    - **Routers**: define applications routes (routes/ folder )
-    - **Migrations**: database migrations (database/migration/ folder) 
+    - Models: services and relations between models are defined in this layer (src/Models/ folder)
+    - Controllers: navigating/pre-processing the http requests (src/Controllers/ foder)
+    - Transformers: data decorators, which are best place to modify the Model's data before returning it(data) to the user (src/Transformers/ folder)
+    - Routers: define applications routes (routes/ folder )
+    - Migrations: database migrations (database/migration/ folder) 
     
 ### Application configuration
 This app is using `.env` file to define it's configurations. you can find it in the root of the project.
@@ -79,12 +79,12 @@ If you **dont** use docker, please keep in mind **integration tests** need an ac
 
 but despite from your environment configurations you always can run `vendor/bin/phpunit tests/Units` to run `unit tests`.
 
-#### End points 
+#### Endpoints 
 Default Base url is : `localhost:8000`. if you want to change it, please check `.docker-compose.yaml` and `phpdocker/nginx` and 
 `phpdocker/php-fpm` configurations folder.
 
 **NOTICE:** 
-All endpoints except `POST /users` endpoint, needs `Authorization` header field, which **MUST** be 
+All endpoints except `POST /users` endpoint, needs `Authorization` as a field in the header's request, which **MUST** be 
 sent through the `header` to endpoints.
  `Authorization` is user id or user uuid(when you create a user these values will be returned in `response`).
 
