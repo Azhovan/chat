@@ -15,7 +15,7 @@ $providers = [
 
 // If container is not loaded(when running unit tests) then
 // create new instance
-$container = !is_null($container) ? $container : new Illuminate\Container\Container;
+$container = isset($container) ? $container : new Illuminate\Container\Container;
 
 // Binding services into the container
 // all of these services will be auto-injected during the runtime
