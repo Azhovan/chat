@@ -6,7 +6,7 @@
 │  
 ├── database           // migrations are defined here 
 │    
-├── phpdocer           // php-fpm, nginx configurations
+├── phpdocker           // php-fpm, nginx configurations
 ├── public             // entry point of the application
 ├── routes             // defined routes
 │
@@ -27,81 +27,82 @@
 
 
 ### Solution
-- Two or more person can send messages through a `conversation` to each other. this design supports group chat also.
-- Every conversation is **secured** (using OpenSSL) by an `encryption key`, means that each conversation has different encryption key.
+- Two or more persons (group chat) can Send/Receive messages through a `conversation` to each other.
+- Every conversation is **secured** by an `encryption key` (using OpenSSL), means that each conversation has different encryption key.
 - encrypted messages are signed using a `message authentication code (MAC)` so that their underlying value can not be modified once encrypted.
 
-- below is the sending message flow:
-    - a conversation is initialized by a user(every user can do it, doesn't matter who)
+- below is the **SENDING** message flow:
+    - a conversation is initialized by a user.
     - user sends message to server
-    - on server, message is encrypted by `OpenSSL` which provides `AES-256` encryption.
-    - message is stored in database 
+    - on the server side, message is encrypted by `OpenSSL` which provides `AES-256` encryption.
+    - message will be stored in the database since it got encrypted.
 
-- below is the reading message flow:
-    - user asks server to get messages (all or in specific conversation)
-    - server reads messages and `decrypts` them by using conversation encryption key
-    - user can read messages ordered by creation time
+- below is the **READING** message flow:
+    - user requests the server to get messages from the specific conversation (or all conversations it has had.)
+    - server reads messages and `decrypts` them by using the conversation's `encryption/decryption` key
+    - user can read decrypted messages ordered by creation time
     
 ### Application design
-Below layers are implemented 
+These layers are implemented 
 
-    - **Models**: services and relation between models are defined in this layer (src/Models folder)
-    - **Controllers**: navigating/pre-processing the http requests (src/Controllers foder)
-    - **Transformers**: data decorators, which are best place to modify Model's data before returning it to user (src/Transformers/ folder)
-    - **Rouers**: define applications routes (routes/ folder )
-    - **Migrations**: tables are created by these functionalities (database/migration/ folder) 
+    - **Models**: services and relations between models are defined in this layer (src/Models/ folder)
+    - **Controllers**: navigating/pre-processing the http requests (src/Controllers/ foder)
+    - **Transformers**: data decorators, which are best place to modify the Model's data before returning it(data) to the user (src/Transformers/ folder)
+    - **Routers**: define applications routes (routes/ folder )
+    - **Migrations**: database migrations (database/migration/ folder) 
     
 ### Application configuration
-This app is using `.env` file to define it's configurations. you can find it in root of the project 
-which by default has below values. 
+This app is using `.env` file to define it's configurations. you can find it in the root of the project.
 ```bash
 APP_KEY= # extra key to encrypt messages, if not provided, default value will be used 
 APP_URI=localhost:8000 # used to run integration tests suite, this should be same for application
 DB_CONNECTION=sqlite 
-DB_HOST= # sqlite host. by default is localhost
+DB_HOST= # sqlite host. default value is localhost
 DB_DATABASE= # absolute path to sqlite file, default value is:  ./database/database.sqlite.chat
 ```
-## Run Application `(With Docker)`
+### Run Application `(With Docker)`
 make sure you have Docker installed. all configurations (dockerfile, nginx) are located inside of `phpdocker/` folder.
-also you can find `docker-composer.yaml` in root of the project 
+Also you can find `docker-composer.yaml` in root of the project.
+
 Run below commands 
 - `docker-compose build && docker-compose up -d` 
 - `docker exec -it chat-php-fpm bash -c "composer install && composer dump-autoload -o && composer migrate"` 
 
-#### Run tests `(integration and unit)`
+### Run tests `(integration & unit)`
 Currently `19 tests, 45 assertions` are included.
 if you are **using** `Docker` to run application, first make sure you have ran above commands, and then run
-` vendor/bin/phpunit tests` which runs both `unit` and `integration` tests
+` vendor/bin/phpunit tests` which runs both `unit` and `integration` tests.
 
 
-if you **dont** use docker, please keep in mind **integration tests** need an active instance of application
-(you can define a host name in your web-server or simply in root of the project run `$(which php) -S localhost:8000`)
+If you **dont** use docker, please keep in mind **integration tests** need an active instance of the application
+(you can define a host name in your web-server or simply in root of the project just run `$(which php) -S localhost:8000`)
 
-but despite from your environment configurations you always can run `vendor/bin/phpunit tests/Units` to run unit tests
+but despite from your environment configurations you always can run `vendor/bin/phpunit tests/Units` to run `unit tests`.
 
 #### End points 
-Base url by default is : `localhost:8000`. if you you want to change it check `.docker-compose.yaml` and `phpdocker/nginx` and 
-`phpdocker/php-fpm` folder
+Default Base url is : `localhost:8000`. if you want to change it, please check `.docker-compose.yaml` and `phpdocker/nginx` and 
+`phpdocker/php-fpm` configurations folder.
 
-NOTICE: 
-All endpoints except user creation endpoint need `Authorization` header field that MUST be 
-passed in header. `Authorization` is simply id of the user or user uuid 
+**NOTICE:** 
+All endpoints except `POST /users` endpoint, needs `Authorization` header field, which **MUST** be 
+sent through the `header` to endpoints.
+ `Authorization` is user id or user uuid(when you create a user these values will be returned in `response`).
 
-#### User Endpoints
+### User Endpoints
 
-1.1 Create User
+### 1.1 Create User
 
-- Response: `user` object is returned
+- Response: contains `user` object (as below).
+- Response codes: 201
+- if the `name` and `uuid` were not send in URL, Then user will be created as `anonymous` 
+and uuid will be generated automatically.
+
 ~~~~
 POST /users/?name=azhi&uuid=220
 Host: localhost:8000
 
-curl example:
+CURL example:
 curl --location --request POST 'localhost:8000/users/?name=azhi&uuid=220'
-
-Response codes: 201 ,
- create object is returned
-query strings **are not mandatory**(in this case anonymous user is created)
 
 Response example
 {
@@ -113,10 +114,10 @@ Response example
 }
 
 ~~~~
-1.2. Get user information
+### 1.2. Get user information
 
-- Please note that `Authorization` is user id or user uuid, which MUST be sent in header
-- Response: `user` object is returned
+- Please note that `Authorization` is user id or user uuid, which **MUST** be send in the header's request
+- Response: contains `user` object (as below).
 
 ~~~~
 GET /users
@@ -124,7 +125,7 @@ Host: localhost:8000
 Content-Type: application/json
 Authorization: 1   
 
-// curl example: 
+CURL example: 
 curl --location --request GET 'localhost:8000/users/' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: 1'
@@ -140,20 +141,19 @@ Response example:
 }
 ~~~~
 
-#### Conversations Endpoints
+### Conversations Endpoints
 
-2. Create conversation
+### 2.1 Create conversation
 
-- Please note that `Authorization` is user id or user uuid, which MUST be sent in header
-- Response: `conversation id` is returned which users can use it to send message to each other
-- Response: conversation id is returned
+- Please note that `Authorization` is user id or user uuid, which **MUST** be sent in the header's request
+- Response: `conversation id` will be returned, (so users can use it to SEND/RECEIVE messages to each other).
 
 ~~~~
 POST /conversations
 Host: localhost:8000
 Authorization: 1  
 
-curl example:
+CURL example:
 curl --location --request POST 'localhost:8000/conversations/' \
 --header 'Authorization: 1'
 
@@ -166,18 +166,18 @@ response example
 }
 ~~~~
 
-2.2 Send message to a conversation
+### 2.2 Send message to a conversation
 
-- Please note that `Authorization` is user id or user uuid, which MUST be sent in header
-- Request url contains conversation id  ({ID} in `POST /conversations/{ID}/messages`)
-- Request body contains message: 
+- Please note that `Authorization` is user id or user uuid, which **MUST** be sent in the header's request.
+- Request's url **MUST** have `conversation id` ( {ID} in `POST /conversations/{ID}/messages`).
+- Response codes: 200, 400
+
+- Request body example(format is `json`):
 ```json
 {
 	"message":"message 1"
 }
 ```
-- Request body format is `json`
-
 
 ~~~~
 POST /conversations/{ID}/messages 
@@ -191,7 +191,7 @@ Body
 	"message":"message 1"
 }
 
-curl example: 
+CURL example: 
 curl --location --request POST 'localhost:8000/conversations/2/messages' \
 --header 'Accept-Charset: application/json' \
 --header 'Authorization: 1' \
@@ -201,7 +201,6 @@ curl --location --request POST 'localhost:8000/conversations/2/messages' \
 }'
 
 
-Response codes: 200, 400
 Response example:
 {
     "user_id": 1,
@@ -213,7 +212,7 @@ Response example:
 }
 ~~~~
 
-2.3 Get messages from a specific conversation
+### 2.3 Get messages from a specific conversation
 
 - Please note that `Authorization` is user id or user uuid, which **MUST** be sent in header
 - Request url contains `conversation id`  (ID in `POST /conversations/{ID}/messages`)
@@ -260,8 +259,8 @@ Response example:
 
 #### extra endpoints 
 
-3.1  Get all conversations for a user
-- this api returns collection of all conversation which user has grouped by conversation
+### 3.1  Get all conversations for a specific user
+- This api returns a collection of conversations which user has had.
 - Please note that `Authorization` is user id or user uuid, which **MUST** be sent in header
 
 
@@ -272,7 +271,7 @@ Accept-Charset: application/json
 Content-Type: application/json
 Authorization: 1
 
-curl example: 
+CURL example: 
 curl --location --request GET 'localhost:8000/users/conversations' \
 --header 'Accept-Charset: application/json' \
 --header 'Content-Type: application/json' \
@@ -280,5 +279,5 @@ curl --location --request GET 'localhost:8000/users/conversations' \
 ~~~~
 
 
-For more details check `tests/` folder 
+For more details please check `tests/` folder. 
 
