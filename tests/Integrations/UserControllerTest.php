@@ -54,7 +54,7 @@ class UserControllerTest extends TestCase
         ]);
         $data = json_decode($response->getBody()->getContents(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals('Elon mask', $data['user_name']);
         $this->assertEquals('999999', $data['user_uuid']);
     }
@@ -64,7 +64,7 @@ class UserControllerTest extends TestCase
     {
         $response = $this->httpClient->post('/users');
         $data = json_decode($response->getBody()->getContents(), true);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals('anonymous', $data['user_name']);
     }
 

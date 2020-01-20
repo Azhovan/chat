@@ -2,7 +2,7 @@
 -----
 
 ~~~
-├── bootstrap          // Configure Container
+├── bootstrap          // Configure the Container
 │  
 ├── database           // migrations are defined here 
 │    
@@ -69,6 +69,7 @@ Run below commands
 - `docker exec -it chat-php-fpm bash -c "composer install && composer dump-autoload -o && composer migrate"` 
 
 #### Run tests `(integration and unit)`
+Currently `19 tests, 45 assertions` are included.
 if you are **using** `Docker` to run application, first make sure you have ran above commands, and then run
 ` vendor/bin/phpunit tests` which runs both `unit` and `integration` tests
 
