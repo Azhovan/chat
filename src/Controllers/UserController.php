@@ -68,7 +68,8 @@ class UserController extends Controller
         );
 
         return $this->response(
-            $this->transformer->transform($user)
+            $this->transformer->transform($user),
+            Response::HTTP_CREATED
         );
     }
 
@@ -90,7 +91,7 @@ class UserController extends Controller
                 $this->transformer->transform($user)
             );
 
-        } catch (ModelNotFoundException $e) {
+        } catch (\Throwable $e) {
             return $this->response(
                 [], Response::HTTP_BAD_REQUEST
             );
