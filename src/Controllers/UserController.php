@@ -6,7 +6,6 @@ use Chat\Controllers\Traits\InteractsWithAuthorizedUser;
 use Chat\Encryptions\EncryptFactory;
 use Chat\Entities\UserObject;
 use Chat\Models\User;
-use Chat\Transformers\MessageTransformer;
 use Chat\Transformers\UserTransformer;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -34,22 +33,13 @@ class UserController extends Controller
     private $transformer;
 
     /**
-     * Data wrapper for user.
-     *
-     * @var MessageTransformer
-     */
-    private $messageTransformer;
-
-    /**
      * UserController constructor.
      *
      * @param UserTransformer $transformer
-     * @param MessageTransformer $msgTransfer
      */
-    public function __construct(UserTransformer $transformer, MessageTransformer $msgTransfer)
+    public function __construct(UserTransformer $transformer)
     {
         $this->transformer = $transformer;
-        $this->messageTransformer = $msgTransfer;
     }
 
     /**
