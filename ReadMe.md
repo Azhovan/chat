@@ -7,7 +7,7 @@
 ├── database           // migrations are defined here 
 │    
 ├── phpdocker           // php-fpm, nginx configurations
-├── public             // entry point of the application
+├── public              // entry point of the application
 ├── routes             // defined routes
 │
 ├── src                   // The source codes folder
@@ -75,7 +75,7 @@ if you are **using** `Docker` to run application, first make sure you have ran a
 
 
 If you **dont** use docker, please keep in mind **integration tests** need an active instance of the application
-(you can define a host name in your web-server or simply in root of the project just run `$(which php) -S localhost:8000`)
+(you can define a host name in your web-server or just go to `/public/` folder inside the project just run `$(which php) -S localhost:8000`)
 
 but despite from your environment configurations you always can run `vendor/bin/phpunit tests/Units` to run `unit tests`.
 
@@ -280,4 +280,3 @@ curl --location --request GET 'localhost:8000/users/conversations' \
 
 
 For more details please check `tests/` folder. 
-

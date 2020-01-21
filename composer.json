@@ -30,7 +30,6 @@
   },
   "scripts": {
     "tests": "vendor/bin/phpunit",
-    "serv": " $(which php) -S localhost:8000",
     "migrate": "$(which php) database/migrate.php",
     "dump": "$(which composer) dump-autoload -o"
   }
