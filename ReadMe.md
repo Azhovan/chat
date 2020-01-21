@@ -83,6 +83,9 @@ but despite from your environment configurations you always can run `vendor/bin/
 Default Base url is : `localhost:8000`. if you want to change it, please check `.docker-compose.yaml` and `phpdocker/nginx` and 
 `phpdocker/php-fpm` configurations folder.
 
+**Heads Up**
+In real world we use jwt tokens or OAuth to identify users in our systems, but here for `simplicity` I have used user's id or uuid to identify users which **MUST** be sent through the `header` to endpoints.
+
 **NOTICE:** 
 All endpoints except `POST /users` endpoint, needs `Authorization` as a field in the header's request, which **MUST** be 
 sent through the `header` to endpoints.
