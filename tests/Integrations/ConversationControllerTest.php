@@ -87,7 +87,7 @@ class ConversationControllerTest extends TestCase
     }
 
     /** @test */
-    public function if_user_does_exist_error_message_is_returned()
+    public function trying_to_get_conversation_for_an_user_which_does_not_exist_causes_error()
     {
         $conversation = Conversation::init();
 
@@ -102,9 +102,9 @@ class ConversationControllerTest extends TestCase
     }
 
     /** @test */
-    public function if_conversation_does_exist_error_message_is_returned()
+    public function trying_to_get_not_existing_conversation_will_cause_400_error()
     {
-        $user = User::createNewUser(new UserObject('name', '1234'));
+        User::createNewUser(new UserObject('name', '1234'));
 
         $this->expectException(\GuzzleHttp\Exception\ClientException::class);
         $response = $this->httpClient->get('conversations/99999/messages', [

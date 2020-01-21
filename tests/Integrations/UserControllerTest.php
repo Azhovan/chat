@@ -69,7 +69,7 @@ class UserControllerTest extends TestCase
     }
 
     /** @test */
-    public function if_user_does_not_exist_404_is_returned()
+    public function if_user_does_not_exist_get_user_endpoint_returns_error()
     {
         $this->expectException(\GuzzleHttp\Exception\ClientException::class);
         $response = $this->httpClient->get("/users",[
