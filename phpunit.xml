@@ -11,7 +11,7 @@
          bootstrap="tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="chat">
+        <testsuite name="project">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

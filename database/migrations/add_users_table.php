@@ -19,8 +19,6 @@ class AddUsersTable extends Migration
         }
 
         Capsule::schema()->create('users', function (Blueprint $table) {
-            // since this table potentially has very high load
-            // I'm choosing bigIncrements
             $table->bigIncrements('id');
             $table->string('name');
             $table->uuid('uuid');

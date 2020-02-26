@@ -1,18 +1,15 @@
 <?php
 
-namespace Chat\Controllers;
+namespace Project\Controllers;
 
 use BadMethodCallException;
-use Chat\Models\User;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Translation\FileLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\Validator;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 abstract class Controller
 {
@@ -69,7 +66,9 @@ abstract class Controller
      */
     public function validate(array $data, array $rules, array $messages = [])
     {
-        $translator = new Translator(new FileLoader(new Filesystem, 'lang'), 'en');
+        $translator = new Translator(
+            new FileLoader(new Filesystem, 'lang'), 'en'
+        );
         $validation = new Factory($translator, new Container);
         return $validation->make($data, $rules, $messages);
     }
