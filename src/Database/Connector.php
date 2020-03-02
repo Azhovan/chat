@@ -1,6 +1,6 @@
 <?php
 
-namespace Project\Database;
+namespace Chat\Database;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -61,7 +61,7 @@ class Database
      */
     private function getDefaultPath(): string
     {
-        return __DIR__ . '/../../database/database.sqlite';
+        return __DIR__ . '/../../database/database.sqlite.chat';
     }
 
     /**

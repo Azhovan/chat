@@ -1,10 +1,16 @@
 <?php
 
+use Chat\Database\Database;
+use Chat\Transformers\ConversationTransformer;
+use Chat\Transformers\MessageTransformer;
+use Chat\Transformers\UserTransformer;
 
-use Project\Database\Database;
 
 $providers = [
-    'classFQN' => 'classFQN'
+    'Chat\Transformers\MessageTransformer' => MessageTransformer::class,
+    'Chat\Database\Database' => Database::class,
+    'Chat\Transformers\UserTransformer' => UserTransformer::class,
+    'Chat\Transformers\ConversationTransformer' => ConversationTransformer::class,
 ];
 
 // If container is not loaded(when running unit tests) then
